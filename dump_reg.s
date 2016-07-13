@@ -125,7 +125,8 @@ Dump_Regist
 
 	msr cpsr_c, r6
 
-    BX   lr							; Return
+    ;BX   lr							; Return
+    mov pc, lr							; Return
 
     END
 
