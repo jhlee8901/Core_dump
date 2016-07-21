@@ -3,20 +3,47 @@
 
 	AREA dump_reg, CODE, READONLY
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;			define
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+REG_BASE_ADDR			EQU	0x1000	; Base_Address
+
+MODE_USR				EQU 0x10
+MODE_FIQ				EQU 0x11
+MODE_IRQ				EQU 0x12
+MODE_SVC				EQU 0x13
+MODE_ABT				EQU 0x17
+MODE_UND				EQU 0x1B
+MODE_SYS				EQU 0x1F
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;			EXPORT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	EXPORT	Dump_Regist
 
-	;MODE_USR         0x10
-	;MODE_FIQ         0x11
-	;MODE_IRQ         0x12
-	;MODE_SVC         0x13
-	;MODE_ABT         0x17
-	;MODE_UND         0x1B
-	;MODE_SYS         0x1F
-	
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;		DUMP all Register
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 Dump_Regist
 
 
 ;;;; General registers, CPSR, Current Exception Registers(r13, r14, SPSR) Dump
+	
+
+	;; save r0 and set the base address
+	push {r0}						; push original r0 (base addr 를 위해 R0를 stack에 저장)
+	LDR r0, =REG_BASE_ADDR			; mov 명령어는 상수가 0~255 8bit 만큼만 가능하기에 LDR을 사용
+
+
+
 	
 	STMIA r0!, {r0 - r15}			; Dump r0 ~ r15 (r13_exception,14_exception)
 	
@@ -28,6 +55,11 @@ Dump_Regist
 
 
 
+	;; restore r0
+	pop {r1}						; pop original r0
+	LDR r2, =REG_BASE_ADDR
+	STR r1,[r2]						; Dump r0 in stack
+
 
 
 	
@@ -35,7 +67,7 @@ Dump_Regist
 ;;;; Banked Registers Dump
 	
 	add r0, r0, #0x10				; Row & Column configuration
-	mrs r6, cpsr					; Save return address	(Current Exception Address)
+	mrs r6, cpsr					; Save return mode	(Current Exception mode)
 
 		
 
@@ -44,7 +76,7 @@ Dump_Regist
 	mrs r7, cpsr					; 
 		
 	bic r7, r7, #&1F				; Clear mode bits
-	orr r7, r7, #0x1F				
+	orr r7, r7, #MODE_SYS				
 	msr cpsr_c, r7					; Change mode
 	
 	STMIA r0!, {r13, r14}			; Dump SYS r13, r14
@@ -56,7 +88,7 @@ Dump_Regist
 	;; UNDEF Dump	
 	
 	bic r7, r7, #&1F				; Clear mode bits
-	orr r7, r7, #0x1B				
+	orr r7, r7, #MODE_UND				
 	msr cpsr_c, r7					; Change mode
 	
 	STMIA r0!, {r13, r14}			; Dump UNDEF r13, r14
@@ -69,7 +101,7 @@ Dump_Regist
 	;; ABT Dump	
 	
 	bic r7, r7, #&1F				; Clear mode bits
-	orr r7, r7, #0x17				
+	orr r7, r7, #MODE_ABT				
 	msr cpsr_c, r7					; Change mode
 	
 	STMIA r0!, {r13, r14}
@@ -83,7 +115,7 @@ Dump_Regist
 	;; SVC Dump	
 	
 	bic r7, r7, #&1F				; Clear mode bits
-	orr r7, r7, #0x13				
+	orr r7, r7, #MODE_SVC				
 	msr cpsr_c, r7					; Change mode
 	
 	STMIA r0!, {r13, r14}			; Dump UNDEF r13, r14
@@ -97,7 +129,7 @@ Dump_Regist
 	;; IRQ Dump	
 	
 	bic r7, r7, #&1F				; Clear mode bits
-	orr r7, r7, #0x12				
+	orr r7, r7, #MODE_IRQ				
 	msr cpsr_c, r7					; Change mode
 	
 	STMIA r0!, {r13, r14}			; Dump UNDEF r13, r14
@@ -111,7 +143,7 @@ Dump_Regist
 	;; FIQ Dump	
 	
 	bic r7, r7, #&1F				; Clear mode bits
-	orr r7, r7, #0x11				
+	orr r7, r7, #MODE_FIQ				
 	msr cpsr_c, r7					; Change mode
 	
 	STMIA r0!, {r8 - r14}			; Dump UNDEF r13, r14
@@ -124,9 +156,8 @@ Dump_Regist
 ;;;; return to original MODE
 
 	msr cpsr_c, r6
-
-    ;BX   lr							; Return
-    mov pc, lr							; Return
+	    
+	mov pc,lr						; Return
 
     END
 
