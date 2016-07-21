@@ -30,7 +30,14 @@ DTCM_ON         EQU 0x04
         IMPORT  |Image$$CPU_STACK_SYS$$ZI$$Limit|
         IMPORT  |Image$$CPU_STACK_ABT$$ZI$$Limit|
         ;IMPORT  |Image$$CPU_STACK_UND$$ZI$$Limit|
-        IMPORT  |Image$$CPU_STACK_IRQ$$ZI$$Limit|
+		
+		
+		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; modify Undefined
+		IMPORT  |Image$$CPU_STACK_UND$$ZI$$Limit|
+        
+		
+		
+		IMPORT  |Image$$CPU_STACK_IRQ$$ZI$$Limit|
         IMPORT  |Image$$CPU_STACK_FIQ$$ZI$$Limit|
 
         IMPORT  __main
@@ -44,12 +51,13 @@ DTCM_ON         EQU 0x04
 	; --------------------------------------------------------------------
 	; Export
 	; --------------------------------------------------------------------
-	EXPORT  harm_reset_handler
-	EXPORT  harm_undefined_handler
+	EXPORT  harm_reset_handler	
 	EXPORT  harm_swi_handler
 	EXPORT  harm_prefetch_handler
 	EXPORT  harm_abort_handler
 	;EXPORT  harm_undefined_handler
+	
+	EXPORT  harm_undefined_handler
 	EXPORT  harm_irq_handler
 	EXPORT  harm_fiq_handler
 
@@ -98,8 +106,9 @@ harm_reset_handler
 	; --------------------------------------------------------------------
 	; Switch to Undefined Exception (UND) mode and Initialize
 	; --------------------------------------------------------------------
-	;MSR CPSR_c, #MODE_UND:OR:I_BIT:OR:F_BIT ; No interrupts
-	;LDR sp, =|Image$$CPU_STACK_UND$$ZI$$Limit|
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; modify Undefined
+	MSR CPSR_c, #MODE_UND:OR:I_BIT:OR:F_BIT ; No interrupts
+	LDR sp, =|Image$$CPU_STACK_UND$$ZI$$Limit|
 	; --------------------------------------------------------------------
 	; Switch to SVC mode and Finish the Setup
 	; --------------------------------------------------------------------
