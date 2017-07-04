@@ -65,3 +65,10 @@ ITM?? data값을 호스트에서 printf 처럼 출력시켜주는 모듈
 
 STM??
 
+==================================================== ssd 관련뉴스
+
+1. difference of between client to Ent. - http://2cpu.co.kr/bbs/board.php?bo_table=QnA&wr_id=439537
+2. new interface PCIe 5.0 - http://www.tomshardware.com/news/pcie-5.0-release-0.3,34720.html
+3. Intel 3D optane ssd DC P4800X - http://www.tomshardware.com/reviews/intel-optane-3d-xpoint-p4800x,5030.html
+4. ADATA's Enterprise SSD - http://www.tomshardware.com/news/adata-new-3d-ssd-computex,34657.html
+5. micron enterprise ssd - http://www.storagereview.com/micron_5100_max_ssd_review
